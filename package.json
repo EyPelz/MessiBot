@@ -1,0 +1,17 @@
+{
+  "name": "messibot",
+  "version": "1.0.0",
+  "description": "Fifa Telegram Bot!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "EyPelz",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.5",
+    "node-telegram-bot-api": "^0.50.0"
+  }
+}
