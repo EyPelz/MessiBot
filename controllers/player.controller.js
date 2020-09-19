@@ -1,36 +1,83 @@
 const Player = require("../models/player");
 
-exports.getPlayers = async (req, res, next) => {
+const stringifyExceptions = ["telegram_id", "_id", "__v"];
+
+exports.getPlayers = async () => {
   try {
     const players = await Player.find();
-    res.status(200).json(players);
+    const list = players.map((p) => p.name).join("\r\n");
+    return `Players currently in the database:\n${list}`;
   } catch (err) {
-    next(err);
+    console.log(err);
+    return;
   }
 };
 
-exports.postPlayer = async (req, res, next) => {
+exports.getMe = async (telegram_id) => {
   try {
-    const name = req.body.name;
-    const player = new Player(name);
-    const newPlayer = await player.save();
-    res.status(201).json(newPlayer);
+    const player = await Player.find({ telegram_id });
+    if (!player) {
+      return `You are not registered in the database`;
+    }
+    return stringifyObj(player, stringifyExceptions);
   } catch (err) {
-    next(err);
+    console.log(err);
+    return;
   }
 };
 
-exports.deletePlayer = async function (req, res, next) {
+const stringifyObj = (jsonObj, exceptions) => {
+  const arr = [];
+  const keys = Object.keys(jsonObj[0]);
+  console.log(keys);
+  for (const key of keys) {
+    if (exceptions.includes(key)) continue;
+    arr.push(`${key}: ${jsonObj[key]}`);
+  }
+  return arr.join("\r\n");
+};
+
+exports.postPlayer = async (name, telegram_id) => {
   try {
-    player = await Player.findById(req.params.id);
+    const player = new Player({ name, telegram_id });
+    await player.save();
+    return `Added ${name} successfully!`;
+  } catch (err) {
+    console.log(err);
+    return `Could not add ${name}`;
+  }
+};
+
+exports.deletePlayer = async function (telegram_id) {
+  try {
+    const player = await Player.findOneAndDelete({ telegram_id });
     if (!player) {
       const err = new Error("Player not found");
       err.statusCode = 404;
-      next(err);
+      console.log(err);
+      return;
     }
-    await player.remove();
-    res.status(200).json("Player deleted");
+    // await player.remove();
+    return `Player ${player.name} deleted`;
   } catch (err) {
-    next(err);
+    console.log(err);
+    return;
+  }
+};
+
+exports.superDeletePlayer = async function (name) {
+  try {
+    const player = await Player.findOneAndDelete({ name });
+    if (!player) {
+      const err = new Error("Player not found");
+      err.statusCode = 404;
+      console.log(err);
+      return;
+    }
+    // await player.remove();
+    return `Player ${player.name} deleted`;
+  } catch (err) {
+    console.log(err);
+    return;
   }
 };
