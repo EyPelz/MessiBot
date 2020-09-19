@@ -2,10 +2,16 @@ const Player = require("../models/player");
 
 const stringifyExceptions = ["telegram_id", "_id", "__v"];
 
+function toTitleCase(str) {
+  return str.replace(/\w\S*/g, function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+}
+
 exports.getPlayers = async () => {
   try {
     const players = await Player.find();
-    const list = players.map((p) => p.name).join("\r\n");
+    const list = players.map((p) => toTitleCase(p.name)).join("\r\n");
     return `Players currently in the database:\n${list}`;
   } catch (err) {
     console.log(err);
@@ -39,6 +45,7 @@ const stringifyObj = (jsonObj, exceptions) => {
 
 exports.postPlayer = async (name, telegram_id) => {
   try {
+    name = name.toLowerCase();
     const player = new Player({ name, telegram_id });
     await player.save();
     return `Added ${name} successfully!`;
@@ -66,6 +73,7 @@ exports.deletePlayer = async function (telegram_id) {
 };
 
 exports.superDeletePlayer = async function (name) {
+  name = name.toLowerCase();
   try {
     const player = await Player.findOneAndDelete({ name });
     if (!player) {

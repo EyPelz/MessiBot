@@ -1,4 +1,5 @@
 const playerController = require("./player.controller");
+const matchController = require("./match.controller");
 const bot = require("../bot");
 
 exports.addPlayer = async (msg, match) => {
@@ -41,4 +42,15 @@ exports.superDeletePlayer = async (msg, match) => {
   const chatId = msg.chat.id;
   const response = await playerController.superDeletePlayer(match[1]);
   bot.sendMessage(chatId, response);
+};
+
+exports.addMatch = async (msg, match) => {
+  const chatId = msg.chat.id;
+  const response = await matchController.postMatch(msg, match);
+  bot.sendMessage(chatId, response);
+};
+
+exports.getMatches = async (msg, match) => {
+  const response = await matchController.getMatches();
+  bot.sendMessage(msg.chat.id, response);
 };

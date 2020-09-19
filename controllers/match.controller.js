@@ -1,42 +1,47 @@
 const Match = require("../models/match");
 const Player = require("../models/player");
 
-exports.getMatches = async (req, res, next) => {
+exports.postMatch = async (msg, regex) => {
   try {
-    const matches = await Match.find();
-    res.status(200).json(matches);
+    const pname1 = regex[1];
+    const score1 = regex[2];
+    const pname2 = regex[3];
+    const score2 = regex[4];
+    // check that the initiator is one of the two players.
+    const player1 = await Player.findOne({ name: pname1 });
+    const player2 = await Player.findOne({ name: pname2 });
+    console.log("p1: ", player1);
+    console.log("p2: ", player2);
+    if (!player1 || !player2) return `Could not find one of the players`;
+    if (
+      !(
+        player1.telegram_id == msg.from.id || player2.telegram_id == msg.from.id
+      )
+    )
+      return `You are not authorized to add a match that does not include yourself!`;
+
+    const match = new Match({ player1, player2, score1, score2 });
+    await match.save();
+    return `Added match successfully!`;
   } catch (err) {
-    next(err);
+    console.log(err);
+    return `Could not add ${name}`;
   }
 };
 
-exports.postMatch = async (req, res, next) => {
+exports.getMatches = async () => {
   try {
-    const score1 = req.body.score1;
-    const score2 = req.body.score2;
-    const pname1 = req.body.pname1;
-    const pname2 = req.body.pname2;
-    const player1 = await Player.find({ name: pname1 }).exec();
-    const player2 = await Player.find({ name: pname2 }).exec();
-    if (!player1) {
-      const err = new Error(`Player ${pname1} not found`);
-      err.statusCode = 404;
-      next(err);
-    }
-    if (!player2) {
-      const err = new Error(`Player ${pname2} not found`);
-      err.statusCode = 404;
-      next(err);
-    }
-    const match = new Match({
-      score1,
-      score2,
-      player1: player1._id,
-      player2: player2._id,
-    });
-    const newMatch = await match.save();
-    res.status(201).json(newMatch);
+    const matches = await Match.find().populate("player1").populate("player2");
+    const list = matches.map((m) => printMatch(m)).join("\r\n");
+    return `Mathces:\n${list}`;
   } catch (err) {
-    next(err);
+    console.log(err);
+    return `Could not get matches`;
   }
 };
+
+const printMatch = (match) => {
+  return `${match.player1.name} ${match.score1} - ${match.score2} ${match.player2.name}`;
+};
+
+exports.deleteMatch = async () => {};

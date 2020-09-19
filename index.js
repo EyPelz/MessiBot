@@ -18,4 +18,8 @@ bot.onText(/\/player me/, botController.getMyPlayer);
 
 bot.onText(/\/player delete/, botController.deleteMyPlayer);
 
-bot.onText(/\/player superDelete (.)/, botController.superDeletePlayer);
+bot.onText(/\/player superDelete (.+)/, botController.superDeletePlayer);
+
+bot.onText(/\/match add (.+) (.+) (.+) (.+)/, botController.addMatch);
+
+bot.onText(/\/match get/, botController.getMatches);
