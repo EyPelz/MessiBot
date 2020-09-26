@@ -11,7 +11,7 @@ function toTitleCase(str) {
 exports.getPlayers = async () => {
   try {
     const players = await Player.find();
-    const list = players.map((p) => toTitleCase(p.name)).join("\r\n");
+    const list = players.map((p) => p.displayName).join("\r\n");
     return `Players currently in the database:\n${list}`;
   } catch (err) {
     console.log(err);
@@ -35,7 +35,7 @@ exports.getMe = async (telegram_id) => {
 const stringifyObj = (jsonObj, exceptions) => {
   const arr = [];
   const keys = Object.keys(jsonObj[0]);
-  console.log(keys);
+  // console.log(keys);
   for (const key of keys) {
     if (exceptions.includes(key)) continue;
     arr.push(`${key}: ${jsonObj[key]}`);
@@ -45,13 +45,14 @@ const stringifyObj = (jsonObj, exceptions) => {
 
 exports.postPlayer = async (name, telegram_id) => {
   try {
+    displayName = name;
     name = name.toLowerCase();
-    const player = new Player({ name, telegram_id });
+    const player = new Player({ name, displayName, telegram_id });
     await player.save();
-    return `Added ${name} successfully!`;
+    return `Added ${displayName} successfully!`;
   } catch (err) {
     console.log(err);
-    return `Could not add ${name}`;
+    return `Could not add ${displayName}`;
   }
 };
 
@@ -65,17 +66,16 @@ exports.deletePlayer = async function (telegram_id) {
       return;
     }
     // await player.remove();
-    return `Player ${player.name} deleted`;
+    return `Player ${player.displayName} deleted`;
   } catch (err) {
     console.log(err);
     return;
   }
 };
 
-exports.superDeletePlayer = async function (name) {
-  name = name.toLowerCase();
+exports.superDeletePlayer = async function (displayName) {
   try {
-    const player = await Player.findOneAndDelete({ name });
+    const player = await Player.findOneAndDelete({ displayName });
     if (!player) {
       const err = new Error("Player not found");
       err.statusCode = 404;
@@ -83,7 +83,7 @@ exports.superDeletePlayer = async function (name) {
       return;
     }
     // await player.remove();
-    return `Player ${player.name} deleted`;
+    return `Player ${player.displayName} deleted`;
   } catch (err) {
     console.log(err);
     return;
