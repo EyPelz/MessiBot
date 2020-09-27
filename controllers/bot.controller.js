@@ -3,6 +3,7 @@ const matchController = require("./match.controller");
 const scoreboardController = require("./scoreboard.controller");
 const commands = require("../models/command");
 const bot = require("../bot");
+const match = require("../models/match");
 
 exports.addPlayer = async (msg, match) => {
   const chatId = msg.chat.id;
@@ -60,17 +61,22 @@ exports.getMatches = async (msg, match) => {
 // Post match (START) ------------------------------------------------------------
 exports.postMatchPlayer1 = async (msg) => {
   const response = await matchController.postMatchPlayer1(msg);
-  // console.log("chatid: ", msg.chat.id);
+  // // deletes the previous message
+  // bot.deleteMessage(msg.chat.id, msg.message_id);
   bot.sendMessage(msg.chat.id, "Who did you play against?", response);
 };
 
 exports.postMatchPlayer2 = async (msg, answer, o_id) => {
   const response = await matchController.postMatchPlayer2(answer, o_id);
+  // deletes the previous message
+  bot.deleteMessage(msg.chat.id, msg.message_id);
   bot.sendMessage(msg.chat.id, "How many goals did you score?", response);
 };
 
 exports.postMatchGoalsPlayer1 = async (msg, answer, o_id) => {
   const response = await matchController.postMatchGoalsPlayer1(answer, o_id);
+  // deletes the previous message
+  bot.deleteMessage(msg.chat.id, msg.message_id);
   bot.sendMessage(
     msg.chat.id,
     `How many goals did ${response.p2name} score?`,
@@ -80,11 +86,25 @@ exports.postMatchGoalsPlayer1 = async (msg, answer, o_id) => {
 
 exports.postMatchGoalsPlayer2 = async (msg, answer, o_id) => {
   const response = await matchController.postMatchGoalsPlayer2(answer, o_id);
+  // deletes the previous message
+  bot.deleteMessage(msg.chat.id, msg.message_id);
   bot.sendMessage(msg.chat.id, response);
+};
+
+exports.exit = (msg, o_id) => {
+  matchController.removeTemp(o_id);
+  // deletes the previous message
+  bot.deleteMessage(msg.chat.id, msg.message_id);
+  bot.sendMessage(msg.chat.id, "Stopped");
 };
 // Post match (END) ------------------------------------------------------------
 
 exports.getScoreboard = async (msg) => {
   const response = await scoreboardController.getScoreboard();
+  bot.sendMessage(msg.chat.id, response);
+};
+
+exports.getMyMatches = async (msg) => {
+  const response = await matchController.getMyMatches(msg.from.id);
   bot.sendMessage(msg.chat.id, response);
 };

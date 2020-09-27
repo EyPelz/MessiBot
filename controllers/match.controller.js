@@ -29,33 +29,17 @@ const removeTemp = (id) => {
   temps = temps.filter((obj) => obj.id !== id);
 };
 
-// exports.postMatch = async (msg, regex) => {
-//   try {
-//     const pname1 = regex[1];
-//     const score1 = regex[2];
-//     const pname2 = regex[3];
-//     const score2 = regex[4];
-//     // check that the initiator is one of the two players.
-//     const player1 = await Player.findOne({ name: pname1 });
-//     const player2 = await Player.findOne({ name: pname2 });
-//     console.log("p1: ", player1);
-//     console.log("p2: ", player2);
-//     if (!player1 || !player2) return `Could not find one of the players`;
-//     if (
-//       !(
-//         player1.telegram_id == msg.from.id || player2.telegram_id == msg.from.id
-//       )
-//     )
-//       return `You are not authorized to add a match that does not include yourself!`;
+exports.removeTemp = removeTemp;
 
-//     const match = new Match({ player1, player2, score1, score2 });
-//     await match.save();
-//     return `Added match successfully!`;
-//   } catch (err) {
-//     console.log(err);
-//     return `Could not add ${name}`;
-//   }
-// };
+const createExitOption = (o_id) => {
+  return {
+    text: "Exit",
+    callback_data: JSON.stringify({
+      answer: "Exit",
+      o_id,
+    }),
+  };
+};
 
 // Post match (START) ------------------------------------------------------------
 
@@ -82,7 +66,7 @@ exports.postMatchPlayer1 = async (msg) => {
     });
     return {
       reply_markup: {
-        inline_keyboard: [names],
+        inline_keyboard: [names, [createExitOption(id)]],
       },
     };
   } catch (err) {
@@ -112,7 +96,11 @@ exports.postMatchPlayer2 = async (telegram_id, o_id) => {
     return {
       reply_markup: {
         // Splicing the array results in two lines of keyboard buttons.
-        inline_keyboard: [inline_keyboard.splice(0, 6), inline_keyboard],
+        inline_keyboard: [
+          inline_keyboard.splice(0, 6),
+          inline_keyboard,
+          [createExitOption(o_id)],
+        ],
       },
     };
   } catch (err) {
@@ -142,7 +130,11 @@ exports.postMatchGoalsPlayer1 = async (player1_goals, o_id) => {
     const reply_markup = {
       reply_markup: {
         // Splicing the array results in two lines of keyboard buttons.
-        inline_keyboard: [inline_keyboard.splice(0, 6), inline_keyboard],
+        inline_keyboard: [
+          inline_keyboard.splice(0, 6),
+          inline_keyboard,
+          [createExitOption(o_id)],
+        ],
       },
     };
     return {
@@ -176,12 +168,31 @@ exports.postMatchGoalsPlayer2 = async (player2_goals, o_id) => {
 
 exports.getMatches = async () => {
   try {
+    console.log("in getMatches");
     const matches = await Match.find().populate("player1").populate("player2");
+    if (matches.length === 0) return `There are no recorded matches yet.`;
     const list = matches.map((m) => printMatch(m)).join("\r\n");
-    return `Mathces:\n${list}`;
+    return `Matches:\n${list}`;
   } catch (err) {
     console.log(err);
     return `Could not get matches`;
+  }
+};
+
+exports.getMyMatches = async (telegram_id) => {
+  try {
+    let matches = await Match.find().populate("player1").populate("player2");
+    matches = matches.filter(
+      (m) =>
+        m.player1.telegram_id === telegram_id ||
+        m.player2.telegram_id === telegram_id
+    );
+    if (matches.length === 0) return `You haven't played yet.`;
+    const list = matches.map((m) => printMatch(m)).join("\r\n");
+    return `Matches:\n${list}`;
+  } catch (err) {
+    console.log(err);
+    return `Could not get your matches`;
   }
 };
 

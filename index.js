@@ -23,7 +23,9 @@ bot.onText(/\/player superDelete (.+)/, botController.superDeletePlayer);
 
 // bot.onText(/\/match add (.+) (.+) (.+) (.+)/, botController.addMatch);
 
-bot.onText(/\/match get/, botController.getMatches);
+bot.onText(/\/match get$/, botController.getMatches);
+
+bot.onText(/\/match getMy/, botController.getMyMatches);
 
 bot.onText(/\/scoreboard/, botController.getScoreboard);
 
@@ -35,6 +37,11 @@ bot.on("callback_query", async (callbackQuery) => {
   const command = data.command;
   const answer = data.answer;
   const o_id = data.o_id || null;
+
+  if (answer === "Exit") {
+    botController.exit(msg, o_id);
+    return;
+  }
 
   if (command === commands.postMatchPlayer1) {
     console.log(`Got input from ${command}`);
