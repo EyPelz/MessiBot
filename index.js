@@ -11,6 +11,8 @@ const botController = require("./controllers/bot.controller");
 
 bot.onText(/\/player add (.+)/, botController.addPlayer);
 
+bot.onText(/\/addplayer/, botController.addPlayerGreet);
+
 bot.onText(/\/player superAdd (.+) (.+)/, botController.superAddPlayer);
 
 bot.onText(/\/player get/, botController.getPlayers);
@@ -25,11 +27,11 @@ bot.onText(/\/player superDelete (.+)/, botController.superDeletePlayer);
 
 bot.onText(/\/match get$/, botController.getMatches);
 
-bot.onText(/\/match getMy/, botController.getMyMatches);
+bot.onText(/\/mymatches/, botController.getMyMatches);
 
 bot.onText(/\/scoreboard/, botController.getScoreboard);
 
-bot.onText(/\/match add/, botController.postMatchPlayer1);
+bot.onText(/\/addmatch/, botController.postMatchPlayer1);
 
 bot.on("callback_query", async (callbackQuery) => {
   const data = JSON.parse(callbackQuery.data);

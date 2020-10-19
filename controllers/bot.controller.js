@@ -1,15 +1,21 @@
 const playerController = require("./player.controller");
 const matchController = require("./match.controller");
 const scoreboardController = require("./scoreboard.controller");
-const commands = require("../models/command");
 const bot = require("../bot");
-const match = require("../models/match");
 
 exports.addPlayer = async (msg, match) => {
   const chatId = msg.chat.id;
   const name = match[1];
   const response = await playerController.postPlayer(name, msg.from.id);
   bot.sendMessage(chatId, response);
+};
+
+exports.addPlayerGreet = async (msg, match) => {
+  const chatId = msg.chat.id;
+  bot.sendMessage(
+    chatId,
+    "To add yourself as a player, write the following:\n/player add *your name*\nYou will be added as *your name*"
+  );
 };
 
 exports.superAddPlayer = async (msg, match) => {

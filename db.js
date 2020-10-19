@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 
 // connect to db (mongodb + mongoose)
-mongoose.connect(process.env.DB_URL, {
+let connectionString = process.env.DB_URL_TEST;
+if (process.env.MODE !== "test") connectionString = process.env.DB_URL_PROD;
+
+mongoose.connect(connectionString, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
 });

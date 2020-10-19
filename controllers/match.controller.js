@@ -179,7 +179,11 @@ exports.getMatches = async () => {
   }
 };
 
-exports.getMyMatches = async (telegram_id) => {
+/**
+ * Finds the user related matches and returns them as an array.
+ * @param {*} telegram_id my id
+ */
+const myMatches = async (telegram_id) => {
   try {
     let matches = await Match.find().populate("player1").populate("player2");
     matches = matches.filter(
@@ -187,6 +191,18 @@ exports.getMyMatches = async (telegram_id) => {
         m.player1.telegram_id === telegram_id ||
         m.player2.telegram_id === telegram_id
     );
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+};
+
+exports.myMatches = myMatches;
+
+exports.getMyMatches = async (telegram_id) => {
+  try {
+    let matches = await myMatches(telegram_id);
+    if (!matches) throw new Error("");
     if (matches.length === 0) return `You haven't played yet.`;
     const list = matches.map((m) => printMatch(m)).join("\r\n");
     return `Matches:\n${list}`;
