@@ -1,28 +1,30 @@
 // init env variables
 require("dotenv").config();
-// const adminId = process.env.ADMIN_ID;
+// init db
+require("./db");
 // init bot
 const bot = require("./bot");
-// init db
-const db = require("./db");
-const commands = require("./models/command");
-const scheduler = require("./schedule");
+
 const express = require("express");
 const bodyParser = require("body-parser");
 
+// if in prod env, initialize server to get webhooks
+if (process.env.MODE !== "test") {
+  const app = express();
+
+  app.use(bodyParser.json());
+
+  app.listen(process.env.PORT || 3000);
+
+  app.post("/", (req, res) => {
+    bot.processUpdate(req.body);
+    res.sendStatus(200);
+  });
+}
+
 // reference bot functions
+const commands = require("./models/command");
 const botController = require("./controllers/bot.controller");
-
-const app = express();
-
-app.use(bodyParser.json());
-
-app.listen(process.env.PORT || 3000);
-
-app.post("/", (req, res) => {
-  bot.processUpdate(req.body);
-  res.sendStatus(200);
-});
 
 bot.onText(/\/player add (.+)/, botController.addPlayer);
 
