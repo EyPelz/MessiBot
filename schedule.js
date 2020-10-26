@@ -10,8 +10,6 @@ const pingHeroku = async () => {
   }
 };
 
-pingHeroku();
-
 if (process.env.mode !== "test") {
   const pinger = schedule.scheduleJob("*/29 * * * *", pingHeroku);
 }
