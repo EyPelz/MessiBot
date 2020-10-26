@@ -6,6 +6,7 @@ const bot = require("./bot");
 // init db
 const db = require("./db");
 const commands = require("./models/command");
+const scheduler = require("./schedule");
 // reference bot functions
 const botController = require("./controllers/bot.controller");
 
