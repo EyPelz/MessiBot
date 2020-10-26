@@ -7,8 +7,22 @@ const bot = require("./bot");
 const db = require("./db");
 const commands = require("./models/command");
 const scheduler = require("./schedule");
+const express = require("express");
+const bodyParser = require("body-parser");
+
 // reference bot functions
 const botController = require("./controllers/bot.controller");
+
+const app = express();
+
+app.use(bodyParser.json());
+
+app.listen(process.env.PORT || 3000);
+
+app.post("/", (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
 
 bot.onText(/\/player add (.+)/, botController.addPlayer);
 
