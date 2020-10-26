@@ -17,7 +17,7 @@ if (process.env.MODE === "test") {
   // create prod instance
   console.log("port: ", port);
   console.log("host: ", host);
-  bot = new TelegramBot(token, { webHook: { port: port, host: host } });
+  bot = new TelegramBot(token);
   bot.setWebHook(`${heroku}`);
 }
 
