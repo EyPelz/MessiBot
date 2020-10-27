@@ -191,6 +191,7 @@ const myMatches = async (telegram_id) => {
         m.player1.telegram_id === telegram_id ||
         m.player2.telegram_id === telegram_id
     );
+    return matches;
   } catch (err) {
     console.log(err);
     return null;

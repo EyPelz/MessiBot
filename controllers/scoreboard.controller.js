@@ -5,22 +5,19 @@ exports.getScoreboard = async () => {
   try {
     const players = await Player.find();
     const matches = await Match.find().populate("player1").populate("player2");
-    const scoreboard = createPlayerPairs(players);
+    const scoreboard = initializeScoreboard(players);
     // console.log(scoreboard);
     matches.forEach((match) => {
       //   console.log(match);
-      const result = scoreboard.find(
-        (r) =>
-          r.player1.telegram_id === match.player1.telegram_id &&
-          r.player2.telegram_id === match.player2.telegram_id
+      // finds the pair of players in the scoreboard, based on the match.
+      const pair = scoreboard.find(
+        (p) =>
+          (p.player1.telegram_id === match.player1.telegram_id &&
+            p.player2.telegram_id === match.player2.telegram_id) ||
+          (p.player1.telegram_id === match.player2.telegram_id &&
+            p.player2.telegram_id === match.player1.telegram_id)
       );
-      //   console.log(result);
-      const winner = deduceMatchWinner(match);
-      if (winner === 1) {
-        result.score1++;
-      } else if (winner === 2) {
-        result.score2++;
-      }
+      increaseWinnerScore(matchWinner(match), pair);
     });
     const scoreboardString = scoreboard
       .map((r) => printScoreboardResult(r))
@@ -32,7 +29,7 @@ exports.getScoreboard = async () => {
   }
 };
 
-const createPlayerPairs = (players) => {
+const initializeScoreboard = (players) => {
   // return [{ player1, score1, player2, score2 }]
   const pairs = [];
   for (let i = 0; i < players.length; i++) {
@@ -51,10 +48,20 @@ const createPlayerPairs = (players) => {
   return pairs;
 };
 
-const deduceMatchWinner = (match) => {
-  if (match.score1 > match.score2) return 1;
-  if (match.score2 > match.score1) return 2;
-  return 0;
+/**
+ * Returns the telegram_id of the match winner. Otherwise, returns null.
+ * @param {*} match The match to deduce the winner from
+ */
+const matchWinner = (match) => {
+  if (match.score1 > match.score2) return match.player1.telegram_id;
+  if (match.score2 > match.score1) return match.player2.telegram_id;
+  return null;
+};
+
+const increaseWinnerScore = (winnerId, pair) => {
+  if (!winnerId) return;
+  if (pair.player1.telegram_id === winnerId) pair.score1++;
+  if (pair.player2.telegram_id === winnerId) pair.score2++;
 };
 
 const printScoreboardResult = (scoreboardResult) => {
