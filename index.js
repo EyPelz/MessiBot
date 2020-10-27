@@ -11,12 +11,13 @@ const bodyParser = require("body-parser");
 // if in prod env, initialize server to get webhooks
 if (process.env.MODE !== "test") {
   const app = express();
+  const token = process.env.TOKEN;
 
   app.use(bodyParser.json());
 
   app.listen(process.env.PORT || 3000);
 
-  app.post("/", (req, res) => {
+  app.post(`/${token}`, (req, res) => {
     bot.processUpdate(req.body);
     res.sendStatus(200);
   });

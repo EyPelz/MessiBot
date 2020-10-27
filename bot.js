@@ -14,7 +14,7 @@ if (process.env.MODE === "test") {
 } else {
   // create prod instance
   bot = new TelegramBot(token);
-  bot.setWebHook(`${heroku}`);
+  bot.setWebHook(`${heroku}/${token}`);
 }
 
 module.exports = bot;
