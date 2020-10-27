@@ -1,6 +1,7 @@
 const playerController = require("./player.controller");
 const matchController = require("./match.controller");
 const scoreboardController = require("./scoreboard.controller");
+const statisticsController = require("./statistics.controller");
 const bot = require("../bot");
 
 exports.addPlayer = async (msg, match) => {
@@ -112,5 +113,10 @@ exports.getScoreboard = async (msg) => {
 
 exports.getMyMatches = async (msg) => {
   const response = await matchController.getMyMatches(msg.from.id);
+  bot.sendMessage(msg.chat.id, response);
+};
+
+exports.getMyGoalStatistics = async (msg) => {
+  const response = await statisticsController.getMyGoalStatistics(msg.from.id);
   bot.sendMessage(msg.chat.id, response);
 };

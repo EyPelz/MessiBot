@@ -27,6 +27,28 @@ if (process.env.MODE !== "test") {
 const commands = require("./models/command");
 const botController = require("./controllers/bot.controller");
 
+// -------------------------------------------------------------------------------
+// Set commands on initialization
+const createBotCommands = () => {
+  const commands = [];
+  commands.push(createBotCommand("addplayer", "Add yourself to the database"));
+  commands.push(createBotCommand("addmatch", "Add a match to the database"));
+  commands.push(createBotCommand("mymatches", "Get your matches"));
+  commands.push(createBotCommand("mygoals", "Get your goals statistics"));
+  commands.push(
+    createBotCommand("scoreboard", "Print the most recent scoreboard")
+  );
+  // console.log({ commands });
+  return commands;
+};
+
+const createBotCommand = (command, description) => {
+  return { command, description };
+};
+
+bot.setMyCommands(createBotCommands());
+// -------------------------------------------------------------------------------
+
 bot.onText(/\/player add (.+)/, botController.addPlayer);
 
 bot.onText(/\/addplayer/, botController.addPlayerGreet);
@@ -46,6 +68,8 @@ bot.onText(/\/player superDelete (.+)/, botController.superDeletePlayer);
 bot.onText(/\/match get$/, botController.getMatches);
 
 bot.onText(/\/mymatches/, botController.getMyMatches);
+
+bot.onText(/\/mygoals/, botController.getMyGoalStatistics);
 
 bot.onText(/\/scoreboard/, botController.getScoreboard);
 
