@@ -74,14 +74,23 @@ exports.postMatchPlayer1 = async (msg) => {
 };
 
 exports.postMatchPlayer2 = async (msg, answer, o_id) => {
-  const response = await matchController.postMatchPlayer2(answer, o_id);
+  const response = await matchController.postMatchPlayer2(msg, answer, o_id);
+  if (!response) {
+    console.log("response is null", " postmatchplayer2");
+    return;
+  }
   // deletes the previous message
   bot.deleteMessage(msg.chat.id, msg.message_id);
   bot.sendMessage(msg.chat.id, "How many goals did you score?", response);
 };
 
 exports.postMatchGoalsPlayer1 = async (msg, answer, o_id) => {
-  const response = await matchController.postMatchGoalsPlayer1(answer, o_id);
+  const response = await matchController.postMatchGoalsPlayer1(
+    msg,
+    answer,
+    o_id
+  );
+  if (!response) return;
   // deletes the previous message
   bot.deleteMessage(msg.chat.id, msg.message_id);
   bot.sendMessage(
@@ -92,14 +101,20 @@ exports.postMatchGoalsPlayer1 = async (msg, answer, o_id) => {
 };
 
 exports.postMatchGoalsPlayer2 = async (msg, answer, o_id) => {
-  const response = await matchController.postMatchGoalsPlayer2(answer, o_id);
+  const response = await matchController.postMatchGoalsPlayer2(
+    msg,
+    answer,
+    o_id
+  );
+  if (!response) return;
   // deletes the previous message
   bot.deleteMessage(msg.chat.id, msg.message_id);
   bot.sendMessage(msg.chat.id, response);
 };
 
 exports.exit = (msg, o_id) => {
-  matchController.removeTemp(o_id);
+  const response = matchController.removeTemp(msg, o_id);
+  if (!response) return;
   // deletes the previous message
   bot.deleteMessage(msg.chat.id, msg.message_id);
   bot.sendMessage(msg.chat.id, "Stopped");

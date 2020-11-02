@@ -78,6 +78,7 @@ bot.onText(/\/addmatch/, botController.postMatchPlayer1);
 bot.on("callback_query", async (callbackQuery) => {
   const data = JSON.parse(callbackQuery.data);
   const msg = callbackQuery.message;
+  msg.sender = callbackQuery.from.id;
   const command = data.command;
   const answer = data.answer;
   const o_id = data.o_id || null;

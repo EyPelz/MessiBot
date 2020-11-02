@@ -25,8 +25,11 @@ const getTemp = (id) => {
   return temps.find((obj) => obj.id === id);
 };
 
-const removeTemp = (id) => {
+const removeTemp = (msg, id) => {
+  const obj = getTemp(id);
+  if (msg.sender !== obj.player1.id) return null;
   temps = temps.filter((obj) => obj.id !== id);
+  return "Ok";
 };
 
 exports.removeTemp = removeTemp;
@@ -78,10 +81,13 @@ exports.postMatchPlayer1 = async (msg) => {
  * @param {Number} telegram_id Telegram Id of player2
  * @param {*} o_id The id of the temp match object.
  */
-exports.postMatchPlayer2 = async (telegram_id, o_id) => {
+exports.postMatchPlayer2 = async (msg, telegram_id, o_id) => {
   try {
-    const player2 = await Player.findOne({ telegram_id });
     const obj = getTemp(o_id);
+    console.log("msg id:", msg.sender);
+    console.log("player id", obj.player1.telegram_id);
+    if (msg.sender !== obj.player1.telegram_id) return null;
+    const player2 = await Player.findOne({ telegram_id });
     obj["player2"] = player2;
     const inline_keyboard = goalsRange.map((num) => {
       return {
@@ -105,6 +111,7 @@ exports.postMatchPlayer2 = async (telegram_id, o_id) => {
     };
   } catch (err) {
     console.log(err);
+    return "An error has occured while creating the match.";
   }
 };
 
@@ -113,9 +120,12 @@ exports.postMatchPlayer2 = async (telegram_id, o_id) => {
  * @param {Number} player1_goals
  * @param {*} o_id The id of the temp match object.
  */
-exports.postMatchGoalsPlayer1 = async (player1_goals, o_id) => {
+exports.postMatchGoalsPlayer1 = async (msg, player1_goals, o_id) => {
   try {
     const obj = getTemp(o_id);
+    console.log("o_id", o_id);
+    console.log("temps", temps);
+    if (msg.sender !== obj.player1.telegram_id) return null;
     obj["score1"] = player1_goals;
     const inline_keyboard = goalsRange.map((num) => {
       return {
@@ -143,6 +153,7 @@ exports.postMatchGoalsPlayer1 = async (player1_goals, o_id) => {
     };
   } catch (err) {
     console.log(err);
+    return "An error has occured while creating the match.";
   }
 };
 
@@ -151,16 +162,18 @@ exports.postMatchGoalsPlayer1 = async (player1_goals, o_id) => {
  * @param {Number} player2_goals
  * @param {*} o_id The id of the temp match object.
  */
-exports.postMatchGoalsPlayer2 = async (player2_goals, o_id) => {
+exports.postMatchGoalsPlayer2 = async (msg, player2_goals, o_id) => {
   try {
     const obj = getTemp(o_id);
+    if (msg.sender !== obj.player1.telegram_id) return null;
     obj["score2"] = player2_goals;
     const match = new Match(obj);
     await match.save();
-    removeTemp(o_id);
+    removeTemp(msg, o_id);
     return `Saved match:\n${printMatch(match)}`;
   } catch (err) {
     console.log(err);
+    return "An error has occured while creating the match.";
   }
 };
 
