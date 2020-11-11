@@ -38,6 +38,7 @@ const createBotCommands = () => {
   commands.push(
     createBotCommand("scoreboard", "Print the most recent scoreboard")
   );
+  commands.push(createBotCommand("table", "Print current standings"));
   // console.log({ commands });
   return commands;
 };
@@ -72,6 +73,8 @@ bot.onText(/\/mymatches/, botController.getMyMatches);
 bot.onText(/\/mygoals/, botController.getMyGoalStatistics);
 
 bot.onText(/\/scoreboard/, botController.getScoreboard);
+
+bot.onText(/\/table/, botController.getTable);
 
 bot.onText(/\/addmatch/, botController.postMatchPlayer1);
 
