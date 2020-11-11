@@ -126,7 +126,7 @@ const getTable = async () => {
     const tableRow = table.find((p) => p.telegram_id === player.telegram_id);
     tableRow.played = tableRow.won + tableRow.drawn + tableRow.lost;
     tableRow.gd = tableRow.gf - tableRow.ga;
-    tableRow.points = tableRow.won * 3 + tableRow.drawn * 2;
+    tableRow.points = tableRow.won * 3 + tableRow.drawn;
   });
   table.sort((r1, r2) => {
     if (r1.points > r2.points) return -1;
