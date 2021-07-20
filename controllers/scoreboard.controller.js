@@ -143,6 +143,7 @@ const getTable = async () => {
 
 exports.getTable = async () => {
   const table = await getTable();
-  return cTable.getTable(table);
+  const consoledTable = cTable.getTable(table);
+  return `<pre>${consoledTable}</pre>`;
 };
 /* ------------------------------ TABLE ------------------------------ */

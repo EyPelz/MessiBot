@@ -128,7 +128,7 @@ exports.getScoreboard = async (msg) => {
 
 exports.getTable = async (msg) => {
   const response = await scoreboardController.getTable();
-  bot.sendMessage(msg.chat.id, response);
+  bot.sendMessage(msg.chat.id, response, { parse_mode: "HTML" });
 };
 
 exports.getMyMatches = async (msg) => {
