@@ -1,4 +1,5 @@
 const Player = require("../models/player");
+const protection = process.env.PROTECT === "true";
 
 const stringifyExceptions = ["telegram_id", "_id", "__v"];
 
@@ -10,6 +11,10 @@ function toTitleCase(str) {
 
 exports.getPlayers = async () => {
   try {
+    // do nothing if protection is on
+    if (protection) {
+      return "Player protection is on. There is nothing to do.";
+    }
     const players = await Player.find();
     const list = players.map((p) => p.displayName).join("\r\n");
     return `Players currently in the database:\n${list}`;
@@ -45,6 +50,10 @@ const stringifyObj = (jsonObj, exceptions) => {
 
 exports.postPlayer = async (name, telegram_id) => {
   try {
+    // do nothing if protection is on
+    if (protection) {
+      return "Player protection is on. There is nothing to do.";
+    }
     displayName = name;
     name = name.toLowerCase();
     const player = new Player({ name, displayName, telegram_id });
@@ -58,6 +67,10 @@ exports.postPlayer = async (name, telegram_id) => {
 
 exports.deletePlayer = async function (telegram_id) {
   try {
+    // do nothing if protection is on
+    if (protection) {
+      return "Player protection is on. There is nothing to do.";
+    }
     const player = await Player.findOneAndDelete({ telegram_id });
     if (!player) {
       const err = new Error("Player not found");
@@ -75,6 +88,10 @@ exports.deletePlayer = async function (telegram_id) {
 
 exports.superDeletePlayer = async function (displayName) {
   try {
+    // do nothing if protection is on
+    if (protection) {
+      return "Player protection is on. There is nothing to do.";
+    }
     const player = await Player.findOneAndDelete({ displayName });
     if (!player) {
       const err = new Error("Player not found");
