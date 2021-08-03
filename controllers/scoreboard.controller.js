@@ -1,11 +1,14 @@
 const Match = require("../models/match");
 const Player = require("../models/player");
 const cTable = require("console.table");
+const season = +process.env.SEASON;
 
 exports.getScoreboard = async () => {
   try {
     const players = await Player.find();
-    const matches = await Match.find().populate("player1").populate("player2");
+    const matches = await Match.find({ season: season })
+      .populate("player1")
+      .populate("player2");
     const scoreboard = initializeScoreboard(players);
     // console.log(scoreboard);
     matches.forEach((match) => {
@@ -102,7 +105,9 @@ const getTable = async () => {
       points: 0,
     };
   });
-  const matches = await Match.find().populate("player1").populate("player2");
+  const matches = await Match.find({ season: season })
+    .populate("player1")
+    .populate("player2");
   matches.forEach((match) => {
     const winnerId = matchWinner(match);
     const p1 = table.find((p) => p.telegram_id === match.player1.telegram_id);

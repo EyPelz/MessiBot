@@ -20,6 +20,10 @@ const matchSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    season: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );

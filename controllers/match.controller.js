@@ -1,6 +1,7 @@
 const Match = require("../models/match");
 const Player = require("../models/player");
 const commands = require("../models/command");
+const season = +process.env.SEASON;
 
 let temps = []; // save temporary matches (while in conversation)
 const goalsRange = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -167,6 +168,7 @@ exports.postMatchGoalsPlayer2 = async (msg, player2_goals, o_id) => {
     const obj = getTemp(o_id);
     if (msg.sender !== obj.player1.telegram_id) return null;
     obj["score2"] = player2_goals;
+    obj["season"] = season;
     const match = new Match(obj);
     await match.save();
     removeTemp(msg, o_id);
@@ -182,7 +184,9 @@ exports.postMatchGoalsPlayer2 = async (msg, player2_goals, o_id) => {
 exports.getMatches = async () => {
   try {
     console.log("in getMatches");
-    const matches = await Match.find().populate("player1").populate("player2");
+    const matches = await Match.find({ season: season })
+      .populate("player1")
+      .populate("player2");
     if (matches.length === 0) return `There are no recorded matches yet.`;
     const list = matches.map((m) => printMatch(m)).join("\r\n");
     return `Matches:\n${list}`;
@@ -198,7 +202,10 @@ exports.getMatches = async () => {
  */
 const myMatches = async (telegram_id) => {
   try {
-    let matches = await Match.find().populate("player1").populate("player2");
+    console.log("season:", season);
+    let matches = await Match.find({ season: season })
+      .populate("player1")
+      .populate("player2");
     matches = matches.filter(
       (m) =>
         m.player1.telegram_id === telegram_id ||
@@ -229,5 +236,27 @@ exports.getMyMatches = async (telegram_id) => {
 const printMatch = (match) => {
   return `${match.player1.displayName} ${match.score1} - ${match.score2} ${match.player2.displayName}`;
 };
+
+// exports.applySeasonOnMatches = async () => {
+//   // const limit = 1;
+//   // let counter = 0;
+//   try {
+//     const matches = await Match.find().populate("player1").populate("player2");
+//     for (const match of matches) {
+//       // console.log(match, typeof match);
+//       if (!match.season) {
+//         match["season"] = season;
+//         await match.save();
+//         // console.log("updated season for match");
+//         // counter++;
+//       }
+//       // if (counter === limit) break;
+//     }
+//     return "Successfully updated season";
+//   } catch (err) {
+//     console.log(err);
+//     return "Could not update season";
+//   }
+// };
 
 exports.deleteMatch = async () => {};

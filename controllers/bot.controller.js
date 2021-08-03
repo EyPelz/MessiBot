@@ -140,3 +140,8 @@ exports.getMyGoalStatistics = async (msg) => {
   const response = await statisticsController.getMyGoalStatistics(msg.from.id);
   bot.sendMessage(msg.chat.id, response);
 };
+
+// exports.applySeason = async (msg) => {
+//   const response = await matchController.applySeasonOnMatches();
+//   bot.sendMessage(msg.chat.id, response);
+// };

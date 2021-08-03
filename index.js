@@ -78,6 +78,8 @@ bot.onText(/\/table/, botController.getTable);
 
 bot.onText(/\/addmatch/, botController.postMatchPlayer1);
 
+// bot.onText(/\/applyseason/, botController.applySeason);
+
 bot.on("callback_query", async (callbackQuery) => {
   const data = JSON.parse(callbackQuery.data);
   const msg = callbackQuery.message;
