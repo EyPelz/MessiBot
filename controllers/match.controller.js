@@ -27,9 +27,14 @@ const getTemp = (id) => {
 };
 
 const removeTemp = (msg, id) => {
+  // console.log("in remove temp");
+  // console.log("id:", id);
+  // console.log("temps:", temps);
+  // console.log("messge", msg);
   const obj = getTemp(id);
-  if (msg.sender !== obj.player1.id) return null;
+  if (msg.sender !== obj.player1.telegram_id) return null;
   temps = temps.filter((obj) => obj.id !== id);
+  // console.log("now temps is", temps);
   return "Ok";
 };
 
@@ -59,18 +64,20 @@ exports.postMatchPlayer1 = async (msg) => {
     const id = addTemp(obj);
     const players = await Player.find({ telegram_id: { $ne: playerTeleId } });
     const names = players.map((p) => {
-      return {
-        text: p.displayName,
-        callback_data: JSON.stringify({
-          command: commands.postMatchPlayer1,
-          answer: p.telegram_id,
-          o_id: id,
-        }),
-      };
+      return [
+        {
+          text: p.displayName,
+          callback_data: JSON.stringify({
+            command: commands.postMatchPlayer1,
+            answer: p.telegram_id,
+            o_id: id,
+          }),
+        },
+      ];
     });
     return {
       reply_markup: {
-        inline_keyboard: [names, [createExitOption(id)]],
+        inline_keyboard: [...names, [createExitOption(id)]],
       },
     };
   } catch (err) {
