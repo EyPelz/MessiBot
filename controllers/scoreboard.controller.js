@@ -116,8 +116,8 @@ const getTable = async () => {
       p1 = table.find((p) => p.telegram_id === match.player1.telegram_id);
       p2 = table.find((p) => p.telegram_id === match.player2.telegram_id);
     } catch (err) {
-      console.err(`match error:`);
-      console.err(match);
+      console.log(`match error:`);
+      console.log(match);
     }
     if (!winnerId) {
       p1.drawn++;
